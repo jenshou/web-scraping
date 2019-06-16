@@ -1,65 +1,28 @@
 # Pulling data from (open) REST APIs
 
-[Huge source of public APIs](https://www.publicapis.com/)
+[Lists of source of public APIs](https://www.publicapis.com/)
 
-We have already seen how to use `requests` to fetch a webpage:
+This is how we use `requests` to fetch a webpage in Python:
 
 ```python
 r = requests.get('http://www.cnn.com')
 print(r.text)
 ```
 
-If the URL is to a page that gives you HTML, we would say that we are fetching a webpage. On the other hand, if the URL is returning data in some form, we would say that we are accessing a *REST* api.
- 
-**REST** is an acronym for *REpresentational State Transfer* and is a very handy way to make something trivial sound very complicated.  Anytime you see the word REST, just think "webpage that gives me data not HTML." There is a massive industry and giant following behind this term but I don't see anything beyond "fetch data from webpage".
+If the URL of that request returns HTML, this is simply fetching a webpage. On the other hand, if the URL is returning data in some form, we would say that we are accessing a *REST* api. 
 
-Anyway, we are going to pull data from web servers that intentionally provide nice data spigot URLs. Information you need in order to get data is typically:
-
-* Base URL, including machine name, port number, and "file" path
-* The names and values of parameters
-* What data comes back and in what format (XML, JSON, CSV, ...)
+Let's take a look at some examples:
 
 ## JSON from openpayments.us
 
-Now, let's look at a website that will give us JSON data: [www.openpayments.us](http://www.openpayments.us).
+[www.openpayments.us](http://www.openpayments.us).
  
 There is a REST data API available at URL template:
 
 ```
 URL = "http://openpayments.us/data?query=%s"
 ```
-**Exercise**: Use `curl` to fetch data about a doctor.
 
-**Exercise**: Fetch the data for a doctor's name, such as `John Chan`. If you want to get fancy, you can pull in the query from a script parameter via:
-
-```python
-query = sys.argv[1]
-```
-
-Sample code:
-
-```
-import requests
-import json
-import sys
-
-URL = "http://openpayments.us/data?query=%s"
-name = sys.argv[1]
-
-r = requests.get(URL % name)
-data = json.loads(r.text)
-
-print(json.dumps(data))
-```
-
-A **technical detail** related to valid strings you can include as part of a URL.  Spaces are not allowed so `John Chan` has to be encoded or "quoted".  Fortunately, `requests` does this automatically for us. If you ever need to quote URLs, use `urllib`:
-
-```python
-from requests.utils import quote
-query = quote(query)
-```
-
-Because `&` is the separator between parameters, it is also invalid in a parameter name or value. Here are some example conversions:
 
 ```python
 >>> import urllib
@@ -78,74 +41,6 @@ data = json.loads(jsondata)
 ```
 
 Dump the JSON using `json.dumps()`.
-
-## Historical stock data
-
-*Yahoo's API was taken down in 2017 so we will use Quandl instead.* 
-
-Register for an API key at [Quandl](https://www.quandl.com/account/api) and then you can use this URL to access, for example, Apple's stock data:
-
-```
-https://www.quandl.com/api/v3/datatables/WIKI/PRICES.csv?ticker=AAPL&api_key=YOURAPIKEY
-```
-
-You have to replace the `AAPL` with whatever stock ticker you want and of course replace `YOURAPIKEY` with your specific API key that you got when you registered.
- 
-Code: [Quandl finance stock history](notes/code/quandl/history.py):
-
-```python
-import sys
-import requests
-
-HistoryURL = "https://www.quandl.com/api/v3/datatables/WIKI/PRICES.csv?ticker=%s&api_key=%s"
-
-ticker = sys.argv[1]  # AAPL
-APIKEY = sys.argv[2]  # your key
-
-url = HistoryURL % (ticker,APIKEY)
-r = requests.get(url)
-csvdata = r.text
-print(csvdata)
-```
-
-The CSV you get back looks like:
-
-```
-ticker,date,open,high,low,close,volume,ex-dividend,split_ratio,adj_open,adj_high,adj_low,adj_close,adj_volume
-AAPL,1980-12-12,28.75,28.87,28.75,28.75,2093900.0,0.0,1.0,0.42270591588018,0.42447025361603,0.42270591588018,0.42270591588018,117258400.0
-AAPL,1980-12-15,27.38,27.38,27.25,27.25,785200.0,0.0,1.0,0.40256306006259,0.40256306006259,0.40065169418209,0.40065169418209,43971200.0
-...
-```
-
-```
-# csv is easy to handle ourselves:
-for row in csvdata.strip().split("\n"):
-    cols = row.split(',')
-    print(', '.join(cols))
-```
-
-**Exercise:** By looking at the [quandl usage doc](https://docs.quandl.com/docs/in-depth-usage-1) and [quandl parameter doc](https://docs.quandl.com/docs/parameters-1) fetch and fetch stock history for TSLA for just 2015 and only get columns `data` and `open`.
-
-```python
-QuoteURL = "https://www.quandl.com/api/v3/datatables/WIKI/PRICES.csv?ticker=%s&api_key=YOURAPIKEY&date.gte=%s&date.lt=%s&qopts.columns=%s"
-```
-
-Here's my solution from the command line:
-
-```bash
-$ curl "https://www.quandl.com/api/v3/datatables/WIKI/PRICES.csv?ticker=AAPL&api_key=SECRET&date.gte=20150101&date.lt=20160101&qopts.columns=date,open"
-```
-
-The data you get back is in CSV format. For stock ticker `TSLA`, you would see two requested fields (close to these values):
-
-```
-date,open
-2015-01-02,111.39
-2015-01-05,108.29
-2015-01-06,106.54
-2015-01-07,107.2
-2015-01-08,109.23
-```
 
 **Exercise**: Change `csv` into `json` in the URL and see that you get JSON back now.
 
