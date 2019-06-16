@@ -9,7 +9,8 @@ Use tweepy to fetch tweets.
 
 * Complicated HTML with JavaScript - in [amazon]
 Created a function that returns a list of tuples, one per book. Inspected with Inspection mode in <span> tags and scraped with user-agent. Output form:
-  ```python
+  
+```python
 books = parseAmazonBestSellers()
 for price, title, author, href in books:
     print(title, author, price)
