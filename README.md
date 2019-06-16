@@ -2,12 +2,12 @@
 
 Examples of scraping data from websites in Python in various form: 
 
-* Open API, clean REST API(OMDB, openpayments) - in [openpayments]
+* Open API, clean REST API(OMDB, openpayments) - in [openpayments](https://github.com/jenshou/web-scraping/openpayments/)
 
-* Registered API - in [twitter]
+* Registered API - in [twitter](https://github.com/jenshou/web-scraping/twitter/)
 Use tweepy to fetch tweets.
 
-* Complicated HTML with JavaScript - in [amazon]
+* Complicated HTML with JavaScript - in [amazon](https://github.com/jenshou/web-scraping/amazon/)
 Created a function that returns a list of tuples, one per book. Inspected with Inspection mode in <span> tags and scraped with user-agent. Output form:
   
 ```python
